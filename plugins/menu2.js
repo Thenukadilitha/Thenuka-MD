@@ -1,5 +1,5 @@
 /*created by King Thenuka 🕵
-contact dev1 263780934873 ♻️
+contact dev1 94760410611 ♻️
 contact dev2 https://t.me/Thenukadilitha ♻️
 © just give credit will you ⚠
 */
