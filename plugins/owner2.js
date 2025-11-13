@@ -13,16 +13,16 @@ cmd({
 async (conn, mek, m, { from }) => {
     try {
         // Owner's contact info
-        const ownerNumber = '+263xxxxxx'; // Replace this with the actual owner number
-        const ownerName = '𓆩ု᪳𝐀𝐋𝐈 𝐈𝐍𝅦𝐒i͜͡𝐃𝐄ှ᪳𓆪'; // Replace this with the owner's name
-        const organization = 'Malvin Team'; // Optional: replace with the owner's organization
+        const ownerNumber = '+94760410611'; // Replace this with the actual owner number
+        const ownerName = '𓆩ုTHENUKA BOT𓆪'; // Replace this with the owner's name
+        const organization = 'Thenuka Team'; // Optional: replace with the owner's organization
 
         // Create a vCard (contact card) for the owner
         const vcard = 'BEGIN:VCARD\n' +
                       'VERSION:3.0\n' +
                       `FN:${ownerName}\n` +  // Full Name
                       `ORG:${organization};\n` +  // Organization (Optional)
-                      `TEL;type=CELL;type=VOICE;waid=${ownerNumber.replace('+', '')}:${ownerNumber}\n` +  // WhatsApp ID and number
+                      `TEL;type=CELL;type=VOICE;waid=${ownerNumber.replace('+94760410611'}:${ownerNumber}\n` +94760410611  // WhatsApp ID and number
                       'END:VCARD';
 
         // Send the vCard first
@@ -37,7 +37,7 @@ async (conn, mek, m, { from }) => {
         await conn.sendMessage(from, {
             text: `This is the owner's contact: ${ownerName}`,
             contextInfo: {
-                mentionedJid: [ownerNumber.replace('+263xxxxxxx') + '+263xxxxxx@s.whatsapp.net'], // Mention the owner
+                mentionedJid: [ownerNumber.replace('+94760410611 + '++94760410611'], // Mention the owner
                 quotedMessageId: sentVCard.key.id // Reference the vCard message
             }
         }, { quoted: mek });
