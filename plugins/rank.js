@@ -5,8 +5,8 @@
  Licensed under the  GPL-3.0 License;
  You may not sell this script.
  It is supplied in the hope that it may be useful.
- * @project_name : Free Bot script
- * @author : Malvin King <https://github.com/kingmalvn>
+ * @project_name : Thenuka script
+ * @author : Thenuka dilitha <https://github.com/Thenukadilitha>
  * @description : A Multi-functional whatsapp bot script.
  * @version 3.0.0
  **/
@@ -65,14 +65,14 @@ cmd({
         const progressBar = "⭐".repeat(progressPercent / 10) + "⚪".repeat(10 - progressPercent / 10);
 
         // URL of the image for the rank
-        const levelImageURL = "https://files.catbox.moe/yfeca5.jpg"; // Replace with your desired image URL
+        const levelImageURL = "https://raw.githubusercontent.com/Thenukadilitha/Thenuka-bot/refs/heads/main/images/IMG-20251020-WA0002.jpg"; // Replace with your desired image URL
         
         // Send rank information in text and image
         const caption = `📊 *Rank Information*\n\n👤 *User*: @${
             target.split("@")[0]
         }\n🔝 *Level*: ${level}\n🔄 *Progression*: ${progressPercent}%\n${progressBar}\n📩 *Messages Sent*: ${
             userData.messages
-        }\n✨ *XP*: ${userData.experience}\n\n> 🤖 POWERED BY MALVIN 🤖`;
+        }\n✨ *XP*: ${userData.experience}\n\n> 🤖 POWERED BY THENUKA🤖`;
 
         // Send the image and caption together
         await conn.sendMessage(
