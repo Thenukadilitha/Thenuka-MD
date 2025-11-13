@@ -1,6 +1,6 @@
 /**
 
-
+const config = require('../config');
  Copyright (C) 2025.
  Licensed under the  GPL-3.0 License;
  You may not sell this script.
@@ -10,7 +10,8 @@
  * @description : A Multi-functional whatsapp bot script.
  * @version 3.0.0
  **/
-
+const config = require('../config');
+const {readEnv} = require('../config');
 const {readEnv} = require('../config')
 const {cmd , commands} = require('../command')
 const os = require("os")
