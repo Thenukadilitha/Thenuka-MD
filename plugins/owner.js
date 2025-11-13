@@ -54,11 +54,7 @@ let dec = `*📍ℝ𝔼ℙ𝕆-𝕃𝕀ℕ𝕂 ❤️‍🔥👇*
 👨‍💻◦https://github.com/your github Thenukadilitha/Thenuka-MD
 
 
-*📍ℙ𝕃𝔼𝔸𝕊𝔼 𝔽𝕆𝕃𝕃𝕆𝕎 𝕄𝕐 𝕎ℍ𝔸𝕋𝕊𝔸ℙℙ ℂℍ𝔸ℕℕ𝔼𝕃 ❤️‍🔥👇*
-
-👨‍💻◦ https://whatsapp.com/channel/0029Vac8SosLY6d7CAFndv3Z
-
-> *Powered by yourname*
+> *Powered by Thenuka dilitha *
 `;
 await conn.sendMessage(from,{image:{url: config.MENU_IMG},caption:dec},{quoted:mek});
 
@@ -80,11 +76,11 @@ let status = `┌─────────────────────
 ├ ⏰ *Runtime:-* ${runtime(process.uptime())}
 ├ 📟 *Ram usage:-* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${Math.round(require('os').totalmem / 1024 / 1024)}MB
 ├ ⚙️ *Platform:-* ${os.hostname()}
-├ 👨‍💻 *Owners:-* your name
+├ 👨‍💻 *Owners:-* Thenuka dilitha 
 ├ 🧬 *Version:-* 1.0.0
 └───────────────────────
 
-> *𝘗𝘖𝘞𝘌𝘙𝘌𝘋 𝘣𝘺 Your Botname*
+> *𝘗𝘖𝘞𝘌𝘙𝘌𝘋 𝘣𝘺 THENUKA BOT*
 `;
 return reply(`${status}`)
   
