@@ -1,59 +1,103 @@
-const config = require('../config');
-const {
-  cmd,
-  commands
-} = require('../command');
-const fetch = require('node-fetch');
+const { cmd, commands } = require("../command");
+const yts = require("yt-search");
+const { ytmp3 } = require("@vreden/youtube_scraper");
 
-cmd({
-  pattern: "ytmp3",
-  category: "downloader",
-  react: "🎥",
-  desc: "Download YouTube audios as MP3",
-  filename: __filename
-},
-async(conn, mek, m, {from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-    try {
-        if (!q) return await reply('Please provide a YouTube audio URL.');
-
-        const url = encodeURIComponent(q);
-        const response = await fetch(`https://dark-shan-yt.koyeb.app/download/ytmp3?url=${url}`);
-        const data = await response.json();
-
-        if (!data.status) return await reply('Failed to fetch audio details. Please check the URL and try again.');
-
-        const audio = data.data;
-        const message = `
-🎶 𝐘𝐓 𝐒𝐎𝐍𝐆 𝐃𝐎𝐖𝐍𝐋𝐎𝐀𝐃 📥
-
-╭━━━━━━━━━●●►
-┢❑ 𝐓𝐢𝐭𝐥𝐞: ${audio.title}
-┢❑ 𝐅𝐨𝐫𝐦𝐚𝐭: ${audio.format}
-┢❑ 𝐓𝐢𝐦𝐞: ${audio.timestump || 'N/A'}
-┢❑ 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐝: ${audio.ago || 'N/A'}
-┢❑ 𝐕𝐢𝐞𝐰𝐬: ${audio.views || 'N/A'}
-┢❑ 𝐋𝐢𝐤𝐞𝐬: ${audio.likes || 'N/A'}
-╰━━━━━━━━●●►
-        `;
-
-       
-        await conn.sendMessage(from, {
-            image: { url: audio.thumbnail },
-            caption: message
-        });
-
-        await conn.sendMessage(from, {
-            document: { url: audio.download },
-            mimetype: 'audio/mp3',
-            fileName: `${audio.title}.mp3`,
-            caption: `your name`
-        });
-
-        await conn.sendMessage(from, {
-            react: { text: '✅', key: mek.key }
-        });
-    } catch (e) {
-        console.error(e);
-        await reply(`📕 An error occurred: ${e.message}`);
+cmd(
+  {
+    pattern: "song",
+    react: "🎶",
+    desc: "Download Song",
+    category: "download",
+    filename: __filename,
+  },
+  async (
+    thenuka,
+    mek,
+    m,
+    {
+      from,
+      quoted,
+      body,
+      isCmd,
+      command,
+      args,
+      q,
+      isGroup,
+      sender,
+      senderNumber,
+      botNumber2,
+      botNumber,
+      pushname,
+      isMe,
+      isOwner,
+      groupMetadata,
+      groupName,
+      participants,
+      groupAdmins,
+      isBotAdmins,
+      isAdmins,
+      reply,
     }
-});
+  ) => {
+    try {
+      if (!q) return reply("❌ *Please provide a song name or YouTube link*");
+
+      const search = await yts(q);
+      const data = search.videos[0];
+      const url = data.url;
+
+      let desc = `
+Song downloader
+🎬 *Title:* ${data.title}
+⏱️ *Duration:* ${data.timestamp}
+📅 *Uploaded:* ${data.ago}
+👀 *Views:* ${data.views.toLocaleString()}
+🔗 *Watch Here:* ${data.url}
+`;
+
+      await thenuka.sendMessage(
+        from,
+        { image: { url: data.thumbnail }, caption: desc },
+        { quoted: mek }
+      );
+
+      const quality = "192";
+      const songData = await ytmp3(url, quality);
+
+      let durationParts = data.timestamp.split(":").map(Number);
+      let totalSeconds =
+        durationParts.length === 3
+          ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
+          : durationParts[0] * 60 + durationParts[1];
+
+      if (totalSeconds > 1800) {
+        return reply("⏳ *Sorry, audio files longer than 30 minutes are not supported.*");
+      }
+
+      await thenuka.sendMessage(
+        from,
+        {
+          audio: { url: songData.download.url },
+          mimetype: "audio/mpeg",
+        },
+        { quoted: mek }
+      );
+
+      await thenuka.sendMessage(
+        from,
+        {
+          document: { url: songData.download.url },
+          mimetype: "audio/mpeg",
+          fileName: `${data.title}.mp3`,
+          caption: "🎶 *Your song is ready to be played!*",
+        },
+        { quoted: mek }
+      );
+
+      return reply("✅ Thank you");
+    } catch (e) {
+      console.log(e);
+      reply(`❌ *Error:* ${e.message} 😞`);
+    }
+  }
+);
