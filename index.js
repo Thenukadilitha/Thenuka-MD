@@ -100,7 +100,7 @@ let up = `*╭──────────────●●►*
 *THENUKA BOT ACTIVE NOW ENJOY♥️🪄*\n\n*PREFIX: ${prefix}*
 
 *╰──────────────●●►*`;
-conn.sendMessage(conn.user.id, { image: { url: https://raw.githubusercontent.com/Thenukadilitha/Thenuka-bot/refs/heads/main/images/IMG-20251020-WA0002.jpg }, caption: up })
+conn.sendMessage(conn.user.id, { image: { url: 'https://raw.githubusercontent.com/Thenukadilitha/Thenuka-bot/refs/heads/main/images/IMG-20251020-WA0002.jpg' }, caption: up })
 
 }
 })
