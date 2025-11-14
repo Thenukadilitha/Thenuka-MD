@@ -2,7 +2,7 @@ const { cmd } = require('../command');
 const askGemini = require('../lib/gemini');
 
 cmd({
-    pattern: "gemini",
+    pattern: "ai",
     desc: "Ask Google Gemini AI",
     category: "AI",
     react: "🤖",
