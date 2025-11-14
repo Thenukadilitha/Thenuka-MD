@@ -1,19 +1,23 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { cmd } = require('../command');
+const askGemini = require('../lib/gemini');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+cmd({
+    pattern: "gemini",
+    desc: "Ask Google Gemini AI",
+    category: "AI",
+    react: "🤖",
+    filename: __filename
+},
 
-async function askGemini(prompt) {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+async (conn, mek, m, { from }) => {
+    const text = m.text.split(" ").slice(1).join(" ");
 
-        const result = await model.generateContent(prompt);
-        const response = result.response.text();
-        return response;
+    if (!text)
+        return await conn.sendMessage(from, { text: "💡 *Use:* .gemini your question\n\nExample:\n`.gemini Explain black holes`" });
 
-    } catch (error) {
-        console.error("Gemini API Error:", error);
-        return "⚠️ Gemini API Error.";
-    }
-}
+    await conn.sendMessage(from, { text: "⏳ *Gemini thinking...*" });
 
-module.exports = askGemini;
+    const reply = await askGemini(text);
+
+    await conn.sendMessage(from, { text: reply }, { quoted: mek });
+});
