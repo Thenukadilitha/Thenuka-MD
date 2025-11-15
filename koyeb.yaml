@@ -1,0 +1,9 @@
+name: Thenuka-MD
+services:
+  - name: thenuka-md-bot
+    dockerfile: Dockerfile
+    routes:
+      - port: 8000
+        path: /
+    env:
+      NODE_ENV: production
