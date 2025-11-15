@@ -10,7 +10,10 @@
  * @description : A Multi-functional whatsapp bot script.
  * @version 3.0.0
  **/
-
+const express = require("express");
+const app = express();
+app.get("/", (req, res) => res.send("Thenuka-MD Running on Koyeb 24/7!"));
+app.listen(process.env.PORT || 8000);
 const {
 default: makeWASocket,
 useMultiFileAuthState,
