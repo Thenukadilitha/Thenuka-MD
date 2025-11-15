@@ -10,11 +10,15 @@
  * @description : A Multi-functional whatsapp bot script.
  * @version 3.0.0
  **/
-const express = require("express");
-const app = express();
-app.get("/", (req, res) => res.send("Thenuka-MD 24/7 Running!"));
-app.listen(process.env.PORT || 8000);
-
+name: Thenuka-MD
+services:
+  - name: thenuka-md-bot
+    dockerfile: Dockerfile
+    routes:
+      - port: 8000
+        path: /
+    env:
+      NODE_ENV: production
 const {
 default: makeWASocket,
 useMultiFileAuthState,
