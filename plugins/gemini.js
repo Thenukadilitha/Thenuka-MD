@@ -1,6 +1,19 @@
 const { cmd } = require('../command');
 const askGemini = require('../lib/gemini');
 
+function getMsgText(m) {
+    return (
+        m.text ||
+        m.message?.conversation ||
+        m.message?.extendedTextMessage?.text ||
+        m.message?.imageMessage?.caption ||
+        m.message?.videoMessage?.caption ||
+        m.message?.buttonsResponseMessage?.selectedButtonId ||
+        m.message?.listResponseMessage?.title ||
+        ""
+    );
+}
+
 cmd({
     pattern: "ai",
     desc: "Ask AI (Google Gemini)",
@@ -11,18 +24,8 @@ cmd({
 
 async (conn, mek, m, { from }) => {
 
-    // SAFE text loader (fix for undefined .split)
-    const userText =
-        m.text ||
-        m.caption ||
-        m.message?.conversation ||
-        m.buttonReply?.selectedDisplayText ||
-        m.templateReply?.hydratedTemplate?.hydratedContentText ||
-        m.listResponse?.singleSelectReply?.selectedRowId ||
-        m.extendedTextMessage?.text ||
-        "";
-
-    const text = userText.split(" ").slice(1).join(" ");
+    const fullText = getMsgText(m);
+    const text = fullText.split(" ").slice(1).join(" ");
 
     if (!text)
         return await conn.sendMessage(from, { 
