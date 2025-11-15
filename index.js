@@ -10,15 +10,7 @@
  * @description : A Multi-functional whatsapp bot script.
  * @version 3.0.0
  **/
-name: Thenuka-MD
-services:
-  - name: thenuka-md-bot
-    dockerfile: Dockerfile
-    routes:
-      - port: 8000
-        path: /
-    env:
-      NODE_ENV: production
+
 const {
 default: makeWASocket,
 useMultiFileAuthState,
