@@ -30,6 +30,7 @@ const P = require('pino')
 const config = require('./config')
 const rankCommand = require('./plugins/rank')
 const qrcode = require('qrcode-terminal')
+const getFbVideoInfo = require("@xaviabot/fb-downloader");
 const { ytmp3 } = require("@vreden/youtube_scraper");
 const StickersTypes = require('wa-sticker-formatter')
 const util = require('util')
