@@ -1,5 +1,5 @@
 const { cmd, commands } = require("../command");
-const getFbVideoInfo = require("@xaviabot/fb-downloader");
+const axios = require("axios");
 
 cmd(
   {
@@ -24,18 +24,6 @@ cmd(
       q,
       isGroup,
       sender,
-      senderNumber,
-      botNumber2,
-      botNumber,
-      pushname,
-      isMe,
-      isOwner,
-      groupMetadata,
-      groupName,
-      participants,
-      groupAdmins,
-      isBotAdmins,
-      isAdmins,
       reply,
     }
   ) => {
@@ -48,19 +36,22 @@ cmd(
 
       reply("*Downloading your video...* ❤️");
 
-      const result = await getFbVideoInfo(q);
-      if (!result || (!result.sd && !result.hd)) {
-        return reply("*Failed to download video. Please try again later.* ☹️");
-      }
+      const api = `https://api.vihangayt.com/facebook?url=${encodeURIComponent(q)}`;
+      const res = await axios.get(api);
 
-      const { title, sd, hd } = result;
-      const bestQualityUrl = hd || sd;
-      const qualityText = hd ? "HD" : "SD";
+      if (!res.data.data)
+        return reply("*Failed to fetch video. Try again later.*");
+
+      const title = res.data.data.title || "Unknown Title";
+      const hd = res.data.data.video_hd;
+      const sd = res.data.data.video_sd;
+      const bestUrl = hd || sd;
+      const quality = hd ? "HD" : "SD";
 
       const desc = `
 Your fb video
-👻 *Title*: ${title || "Unknown"}
-👻 *Quality*: ${qualityText}
+👻 *Title*: ${title}
+👻 *Quality*: ${quality}
 `;
 
       await thenuka.sendMessage(
@@ -77,16 +68,17 @@ Your fb video
       await thenuka.sendMessage(
         from,
         {
-          video: { url: bestQualityUrl },
-          caption: `*📥 Downloaded in ${qualityText} quality*`,
+          video: { url: bestUrl },
+          caption: `*📥 Downloaded in ${quality} quality*`,
         },
         { quoted: mek }
       );
 
-      return reply("Thank you for using thenuka bot");
+      return reply("Thank you for using Thenuka Bot ❤️");
+
     } catch (e) {
       console.error(e);
-      reply(`*Error:* ${e.message || e}`);
+      reply(`*Error:* ${e.message}`);
     }
   }
 );
