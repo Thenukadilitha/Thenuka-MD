@@ -1,80 +1,92 @@
-const axios = require('axios');
-const { cmd } = require('../command'); // adjust path
+const { cmd, commands } = require("../command");
+const getFbVideoInfo = require("@xaviabot/fb-downloader");
 
-async function facebookCommand(sock, chatId, message) {
-    try {
-        const jid = typeof chatId === 'string' ? chatId : chatId?.id || chatId?.remoteJid;
-        if (!jid) return;
-
-        const body =
-            message.message?.conversation ||
-            message.message?.extendedTextMessage?.text ||
-            message.message?.imageMessage?.caption ||
-            "";
-
-        const url = body.split(" ").slice(1).join(" ").trim();
-
-        if (!url) {
-            return await sock.sendMessage(jid, {
-                text: "⚠️ Please provide a Facebook video URL.\nExample: .fb https://www.facebook.com/..."
-            }, { quoted: message });
-        }
-
-        if (!url.includes("facebook.com")) {
-            return await sock.sendMessage(jid, {
-                text: "❌ That is not a Facebook link."
-            }, { quoted: message });
-        }
-
-        await sock.sendMessage(jid, {
-            react: { text: "🔄", key: message.key }
-        });
-
-        const api = `https://api.siputzx.my.id/api/d/facebook?url=${encodeURIComponent(url)}`;
-        const res = await axios.get(api, {
-            headers: { "User-Agent": "Mozilla/5.0" },
-            timeout: 15000
-        });
-
-        const data = res.data;
-
-        if (!data || !data.status || !Array.isArray(data.data)) {
-            return await sock.sendMessage(jid, {
-                text: "❌ Failed to fetch video. API might be down or link is private."
-            }, { quoted: message });
-        }
-
-        const hd = data.data.find(v => v.quality?.toUpperCase() === "HD");
-        const sd = data.data.find(v => v.quality?.toUpperCase() === "SD");
-        const videoUrl = hd?.url || sd?.url;
-
-        if (!videoUrl) {
-            return await sock.sendMessage(jid, {
-                text: "❌ No downloadable video found."
-            }, { quoted: message });
-        }
-
-        const caption = `📥 𝗙𝗮𝗰𝗲𝗯𝗼𝗼𝗸 𝗩𝗶𝗱𝗲𝗼\n\n📝 Title: ${data.title || "Unknown"}`;
-
-        await sock.sendMessage(jid, {
-            video: { url: videoUrl },
-            mimetype: "video/mp4",
-            caption: caption
-        }, { quoted: message });
-
-    } catch (e) {
-        console.error("FB Command Error:", e);
-        const jid = typeof chatId === 'string' ? chatId : chatId?.id || chatId?.remoteJid;
-        if (!jid) return;
-        await sock.sendMessage(jid, {
-            text: "⚠️ Error occurred: " + e.message
-        }, { quoted: message });
-    }
-}
-
-cmd({
+cmd(
+  {
     pattern: "fb",
     alias: ["facebook", "fbdownload"],
-}, facebookCommand);
+    react: "✅",
+    desc: "Download Facebook Video",
+    category: "download",
+    filename: __filename,
+  },
+  async (
+    thenuka,
+    mek,
+    m,
+    {
+      from,
+      quoted,
+      body,
+      isCmd,
+      command,
+      args,
+      q,
+      isGroup,
+      sender,
+      senderNumber,
+      botNumber2,
+      botNumber,
+      pushname,
+      isMe,
+      isOwner,
+      groupMetadata,
+      groupName,
+      participants,
+      groupAdmins,
+      isBotAdmins,
+      isAdmins,
+      reply,
+    }
+  ) => {
+    try {
+      if (!q) return reply("*Please provide a valid Facebook video URL!* ❤️");
 
-module.exports = facebookCommand;
+      const fbRegex = /(https?:\/\/)?(www\.)?(facebook|fb)\.com\/.+/;
+      if (!fbRegex.test(q))
+        return reply("*Invalid Facebook URL! Please check and try again.* ☹️");
+
+      reply("*Downloading your video...* ❤️");
+
+      const result = await getFbVideoInfo(q);
+      if (!result || (!result.sd && !result.hd)) {
+        return reply("*Failed to download video. Please try again later.* ☹️");
+      }
+
+      const { title, sd, hd } = result;
+      const bestQualityUrl = hd || sd;
+      const qualityText = hd ? "HD" : "SD";
+
+      const desc = `
+Your fb video
+👻 *Title*: ${title || "Unknown"}
+👻 *Quality*: ${qualityText}
+`;
+
+      await thenuka.sendMessage(
+        from,
+        {
+          image: {
+            url: "https://github.com/Thenukadilitha/Thenuka-bot/blob/main/Images/IMG-20251020-WA0002.jpg?raw=true",
+          },
+          caption: desc,
+        },
+        { quoted: mek }
+      );
+
+      await thenuka.sendMessage(
+        from,
+        {
+          video: { url: bestQualityUrl },
+          caption: `*📥 Downloaded in ${qualityText} quality*`,
+        },
+        { quoted: mek }
+      );
+
+      return reply("Thank you for using thenuka bot");
+    } catch (e) {
+      console.error(e);
+      reply(`*Error:* ${e.message || e}`);
+    }
+  }
+);
