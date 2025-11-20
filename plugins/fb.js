@@ -1,8 +1,11 @@
 const axios = require('axios');
-const { cmd } = require('../command'); // ← make sure path is correct
+const { cmd } = require('../command'); // adjust path
 
 async function facebookCommand(sock, chatId, message) {
     try {
+        const jid = typeof chatId === 'string' ? chatId : chatId?.id || chatId?.remoteJid;
+        if (!jid) return;
+
         const body =
             message.message?.conversation ||
             message.message?.extendedTextMessage?.text ||
@@ -12,18 +15,18 @@ async function facebookCommand(sock, chatId, message) {
         const url = body.split(" ").slice(1).join(" ").trim();
 
         if (!url) {
-            return await sock.sendMessage(chatId, {
+            return await sock.sendMessage(jid, {
                 text: "⚠️ Please provide a Facebook video URL.\nExample: .fb https://www.facebook.com/..."
             }, { quoted: message });
         }
 
         if (!url.includes("facebook.com")) {
-            return await sock.sendMessage(chatId, {
+            return await sock.sendMessage(jid, {
                 text: "❌ That is not a Facebook link."
             }, { quoted: message });
         }
 
-        await sock.sendMessage(chatId, {
+        await sock.sendMessage(jid, {
             react: { text: "🔄", key: message.key }
         });
 
@@ -36,7 +39,7 @@ async function facebookCommand(sock, chatId, message) {
         const data = res.data;
 
         if (!data || !data.status || !Array.isArray(data.data)) {
-            return await sock.sendMessage(chatId, {
+            return await sock.sendMessage(jid, {
                 text: "❌ Failed to fetch video. API might be down or link is private."
             }, { quoted: message });
         }
@@ -46,14 +49,14 @@ async function facebookCommand(sock, chatId, message) {
         const videoUrl = hd?.url || sd?.url;
 
         if (!videoUrl) {
-            return await sock.sendMessage(chatId, {
+            return await sock.sendMessage(jid, {
                 text: "❌ No downloadable video found."
             }, { quoted: message });
         }
 
         const caption = `📥 𝗙𝗮𝗰𝗲𝗯𝗼𝗼𝗸 𝗩𝗶𝗱𝗲𝗼\n\n📝 Title: ${data.title || "Unknown"}`;
 
-        await sock.sendMessage(chatId, {
+        await sock.sendMessage(jid, {
             video: { url: videoUrl },
             mimetype: "video/mp4",
             caption: caption
@@ -61,13 +64,14 @@ async function facebookCommand(sock, chatId, message) {
 
     } catch (e) {
         console.error("FB Command Error:", e);
-        await sock.sendMessage(chatId, {
+        const jid = typeof chatId === 'string' ? chatId : chatId?.id || chatId?.remoteJid;
+        if (!jid) return;
+        await sock.sendMessage(jid, {
             text: "⚠️ Error occurred: " + e.message
         }, { quoted: message });
     }
 }
 
-// Register command
 cmd({
     pattern: "fb",
     alias: ["facebook", "fbdownload"],
