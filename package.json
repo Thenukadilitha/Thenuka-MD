@@ -8,6 +8,9 @@
     "stop": "pm2 stop Thenuka-MD",
     "restart": "pm2 restart Thenuka-MD"
   },
+  "engines": {
+  "node": "18.x"
+  }
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.21",
     "@adiwajshing/keyed-db": "^0.2.4",
