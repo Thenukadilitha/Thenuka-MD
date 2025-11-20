@@ -1,8 +1,8 @@
 const axios = require('axios');
+const { cmd } = require('../command'); // ← make sure path is correct
 
 async function facebookCommand(sock, chatId, message) {
     try {
-        // Get message text
         const body =
             message.message?.conversation ||
             message.message?.extendedTextMessage?.text ||
@@ -23,12 +23,10 @@ async function facebookCommand(sock, chatId, message) {
             }, { quoted: message });
         }
 
-        // React to show loading
         await sock.sendMessage(chatId, {
             react: { text: "🔄", key: message.key }
         });
 
-        // Call Siputzx API
         const api = `https://api.siputzx.my.id/api/d/facebook?url=${encodeURIComponent(url)}`;
         const res = await axios.get(api, {
             headers: { "User-Agent": "Mozilla/5.0" },
@@ -43,10 +41,8 @@ async function facebookCommand(sock, chatId, message) {
             }, { quoted: message });
         }
 
-        // Select HD first, fallback to SD
         const hd = data.data.find(v => v.quality?.toUpperCase() === "HD");
         const sd = data.data.find(v => v.quality?.toUpperCase() === "SD");
-
         const videoUrl = hd?.url || sd?.url;
 
         if (!videoUrl) {
@@ -57,7 +53,6 @@ async function facebookCommand(sock, chatId, message) {
 
         const caption = `📥 𝗙𝗮𝗰𝗲𝗯𝗼𝗼𝗸 𝗩𝗶𝗱𝗲𝗼\n\n📝 Title: ${data.title || "Unknown"}`;
 
-        // Send video by URL
         await sock.sendMessage(chatId, {
             video: { url: videoUrl },
             mimetype: "video/mp4",
