@@ -2,6 +2,13 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
+const facebookCommand = require('./facebookCommand');
+
+cmd({
+    pattern: "fb",
+    alias: ["facebook", "fbdownload"],
+}, facebookCommand);
+
 async function facebookCommand(sock, chatId, message) {
     try {
         const text = message.message?.conversation || message.message?.extendedTextMessage?.text;
