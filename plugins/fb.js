@@ -1,92 +1,68 @@
-const { cmd, commands } = require("../command");
-const getFbVideoInfo = require("@xaviabot/fb-downloader");
+const { cmd, commands } = require('../command');
+const axios = require('axios');
 
-cmd(
-  {
+// 👇 අලුතෙන් config file එක import කරන්න
+const config = require('../config'); 
+
+// 👇 කලින් තිබ්බ hardcoded token එක අයින් කරලා මේක දාන්න
+const APIFY_TOKEN = config.APIFY_TOKEN; 
+
+cmd({
     pattern: "fb",
-    alias: ["facebook", "fbdownload"],
-    react: "✅",
-    desc: "Download Facebook Video",
+// ... (ඉතුරු කෝඩ් එක ඒ විදියටම තියන්න)
+
+cmd({
+    pattern: "fb",
+    alias: ["facebook", "fbdl"],
+    desc: "Download Facebook videos using Apify",
     category: "download",
-    filename: __filename,
-  },
-  async (
-    thenuka,
-    mek,
-    m,
-    {
-      from,
-      quoted,
-      body,
-      isCmd,
-      command,
-      args,
-      q,
-      isGroup,
-      sender,
-      senderNumber,
-      botNumber2,
-      botNumber,
-      pushname,
-      isMe,
-      isOwner,
-      groupMetadata,
-      groupName,
-      participants,
-      groupAdmins,
-      isBotAdmins,
-      isAdmins,
-      reply,
-    }
-  ) => {
+    react: "blue",
+    filename: __filename
+},
+async(conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-      if (!q) return reply("*Please provide a valid Facebook video URL!* ❤️");
+        if (!q) return reply("*කරුණාකර Facebook video link එකක් ලබා දෙන්න.* \nExample: .fb https://fb.watch/...");
+        if (!q.includes('facebook.com') && !q.includes('fb.watch')) return reply("*මෙය වලංගු Facebook link එකක් නොවේ.*");
 
-      const fbRegex = /(https?:\/\/)?(www\.)?(facebook|fb)\.com\/.+/;
-      if (!fbRegex.test(q))
-        return reply("*Invalid Facebook URL! Please check and try again.* ☹️");
+        // Downloading status එක පෙන්වීම
+        await conn.sendMessage(from, { react: { text: "⬇️", key: mek.key } });
+        reply("*Video එක Apify හරහා Download කරමින් පවතී. කරුණාකර රැඳී සිටින්න...*");
 
-      reply("*Downloading your video...* ❤️");
+        // Apify Actor එක run කරලා data එක කෙලින්ම ලබා ගැනීම (Sync Run)
+        // Actor ID: Ktp1rRNMlJgxmJ1Ic
+        const apifyUrl = `https://api.apify.com/v2/acts/Ktp1rRNMlJgxmJ1Ic/run-sync-get-dataset-items?token=${APIFY_TOKEN}`;
+        
+        const response = await axios.post(apifyUrl, {
+            "startUrls": [{ "url": q }]
+        });
 
-      const result = await getFbVideoInfo(q);
-      if (!result || (!result.sd && !result.hd)) {
-        return reply("*Failed to download video. Please try again later.* ☹️");
-      }
+        const data = response.data;
 
-      const { title, sd, hd } = result;
-      const bestQualityUrl = hd || sd;
-      const qualityText = hd ? "HD" : "SD";
+        if (data && data.length > 0) {
+            const videoInfo = data[0];
+            
+            // Video URL එක තෝරාගැනීම (HD හෝ SD)
+            const videoUrl = videoInfo.videoUrl || videoInfo.hdUrl || videoInfo.sdUrl;
+            const caption = videoInfo.title || "Facebook Video";
 
-      const desc = `
-Your fb video
-👻 *Title*: ${title || "Unknown"}
-👻 *Quality*: ${qualityText}
-`;
+            if (videoUrl) {
+                // Video එක යැවීම
+                await conn.sendMessage(from, { 
+                    video: { url: videoUrl }, 
+                    caption: `*🎥 FB DOWNLOADER (APIFY)*\n\n📌 *Title:* ${caption}\n\n🤖 *Bot:* Thenuka-MD`,
+                    mimetype: "video/mp4"
+                }, { quoted: mek });
 
-      await thenuka.sendMessage(
-        from,
-        {
-          image: {
-            url: "https://github.com/Thenukadilitha/Thenuka-bot/blob/main/Images/IMG-20251020-WA0002.jpg?raw=true",
-          },
-          caption: desc,
-        },
-        { quoted: mek }
-      );
+                await conn.sendMessage(from, { react: { text: "✅", key: mek.key } });
+            } else {
+                reply("Apify එකෙන් Video URL එකක් සොයාගත නොහැකි විය. Privacy settings පරීක්ෂා කරන්න.");
+            }
+        } else {
+            reply("Video එක සොයාගත නොහැක. Link එක නිවැරදි දැයි බලන්න.");
+        }
 
-      await thenuka.sendMessage(
-        from,
-        {
-          video: { url: bestQualityUrl },
-          caption: `*📥 Downloaded in ${qualityText} quality*`,
-        },
-        { quoted: mek }
-      );
-
-      return reply("Thank you for using thenuka bot");
     } catch (e) {
-      console.error(e);
-      reply(`*Error:* ${e.message || e}`);
+        console.log(e);
+        reply(`Error: ${e.response ? e.response.data.error.message : e.message}`);
     }
-  }
-);
+});
