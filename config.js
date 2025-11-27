@@ -1,28 +1,3 @@
-/**
-
-
- Copyright (C) 2025.
- Licensed under the  GPL-3.0 License;
- You may not sell this script.
- It is supplied in the hope that it may be useful.
- * @project_name : Free Bot script
- * @author : Malvin King <https://github.com/kingmalvn>
- * @description : A Multi-functional whatsapp bot script.
- * @version 3.0.0
- **/
-
-
-function convertToBool(text, fault = 'true') {
-    return text === fault ? true : false;
-}
-module.exports = {
-
-MONGODB: process.env.MONGODB || "mongodb://mongo:OZTIvyPWIpiJXVdNQwGOFbBofpfALZNP@switchyard.proxy.rlwy.net:35776",
-GEMINI_API_KEY: process.env.GEMINI_API_KEY || "AIzaSyDzyQ7tnQkquWX8bc1y9TE0auCHbC_QQO8",
-tokenm: process.env.GITHUB_TOKEN || "false",
-repo: process.env.GITHUB_REPO || "Thenuka-MD",
-}
-
 const fs = require('fs');
 if (fs.existsSync('config.env')) require('dotenv').config({ path: './config.env' });
 
@@ -50,5 +25,7 @@ AUTO_REACT: process.env.AUTO_REACT || "false",
 HEART_REACT: process.env.HEART_REACT || "false",
 OWNER_REACT: process.env.OWNER_REACT || "false",
 BOT_NAME: process.env.BOT_NAME || "『Thenuka bot 』",
+// 👇👇👇 මෙතන තමයි අලුත් පේළිය එකතු කරන්න ඕනේ 👇👇👇
+APIFY_TOKEN: process.env.APIFY_TOKEN || "", // <-- NEW LINE HERE (ඔබගේ Apify Token එක මෙහි දමන්න)
 OMDB_API_KEY: process.env.OMDB_API_KEY || "76cb7f39", // omdbapi.com
 };
